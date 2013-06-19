@@ -1,4 +1,4 @@
-import ocv.fun.*;
+import ocv.*;
 import processing.video.*;
 
 import org.opencv.video.*;
@@ -17,16 +17,18 @@ import java.util.Vector;
 
 PImage pimg;
 Capture cam;
-ocvP5 p;
+ocvP5 ocv;
 CascadeClassifier classifier;
 
 ArrayList<Rect> faceRects;
 
 void setup()
 {
-  System.load(new File("/Users/joshua.noble/code/OPENCVgit/opencv/build/lib/libopencv_java245.dylib").getAbsolutePath());
+  // This is what you'll load if you're loading from MacPorts, otherwise this should be
+  // wherever you built the OpenCV libraries
+  System.load(new File("/opt/local/share/OpenCV/java/libopencv_java245.dylib").getAbsolutePath());
 
-  p = new ocvP5(this);  
+  ocv = new ocvP5(this);  
   size(640, 480);
 
   String[] cameras = Capture.list();
@@ -35,7 +37,9 @@ void setup()
   
   classifier = new CascadeClassifier(dataPath("haarcascade_frontalface_default.xml"));
   
-  faceRects = new ArrayList();
+  faceRects = new ArrayList(); 
+  stroke(255);
+  noFill();
 }
 
 void draw() 
@@ -45,7 +49,7 @@ void draw()
   {
     cam.read();
     pimg = cam;
-    Mat m = p.toCV(pimg);
+    Mat m = ocv.toCV(pimg);
 
     Mat gray = new Mat(m.rows(), m.cols(), CvType.CV_8U);
     Imgproc.cvtColor(m, gray, Imgproc.COLOR_BGRA2GRAY);
@@ -54,11 +58,6 @@ void draw()
 
     Size minSize = new Size(150, 150);
     Size maxSize = new Size(300, 300);
-
-//    classifier.detectMultiScale(m, objects, 1, 3, 
-//    (cannyPruning ? CASCADE_DO_CANNY_PRUNING : 0) |
-//      (findBiggestObject ? CASCADE_FIND_BIGGEST_OBJECT | CASCADE_DO_ROUGH_SEARCH : 0), 
-//    minSize, maxSize);
 
     classifier.detectMultiScale(gray, objects, 1.1, 3, Objdetect.CASCADE_DO_CANNY_PRUNING | Objdetect.CASCADE_DO_ROUGH_SEARCH, minSize, maxSize);
 
