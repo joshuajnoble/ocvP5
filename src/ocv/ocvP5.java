@@ -1,5 +1,5 @@
  
-package ocv.fun;
+package ocv;
 
 import processing.core.*;
 
